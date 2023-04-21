@@ -14,3 +14,4 @@ main-debug: $(SRCS) $(HEADERS)
 
 clean:
 	rm -f main main-debug
+

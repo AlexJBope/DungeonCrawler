@@ -1,8 +1,4 @@
 #include "buildRooms.h"
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 
 // Initialize/
 
@@ -16,32 +12,29 @@ struct createdRooms createdRooms[MAGIC_NUMBER];
 int randint(int n);
 int numRoomsGenerated;
 int randNum;
-int numRooms;
+size_t numRooms;
 
 //////////////////////////////////////////////////////////////////
 // BUILD ROOMS FUNCTION
 // this function creates the map for the game
 //////////////////////////////////////////////////////////////////
-int buildRooms(void) {
-  srand(time(NULL));
-  struct openDoor openDoors[MAGIC_NUMBER] = {0};
+struct createdRooms *buildRooms(void) {
 
-  for (int i = 0; i < MAGIC_NUMBER; i++) {
-    createdRooms[i].xCoordinate = 0;
-    createdRooms[i].yCoordinate = 0;
-  }
+  // srand(time(NULL));
+  srand(5);
+  struct openDoor openDoors[MAGIC_NUMBER] = {0};
 
   for (int i = 1; i < AMOUNT_ROOMS; i++) {
     // this balances the amount of rooms of each type
     randNum = (rand() % 4) + 1;
     roomsToCreate[i] = randNum;
     numRooms += randNum;
-    printf("amount of  %d door rooms: %d\n", i + 1,
-           roomsToCreate[i]); // error checking
+    // printf("amount of  %d door rooms: %d\n", i + 1,
+    //        roomsToCreate[i]); // error checking
   }
 
   //  starting room
-  numRooms ++; //add for strating room
+  numRooms++; // add for strating room
   createdRooms[0].xCoordinate = 0;
   createdRooms[0].yCoordinate = 0;
   createdRooms[0].top = true;
@@ -61,11 +54,10 @@ int buildRooms(void) {
     //   int nextRoom = (rand() % 3) + 1;
     // }
 
-    printf("\n ---NEW LOOP--- \nlength of the createdRooms: %zu\n", numRooms);
-
+    // printf("\n ---NEW LOOP--- \nlength of the createdRooms: %zu\n",
+    // numRooms);
 
     amountOpenDoors = checkOpenDoors(createdRooms, openDoors, numRooms);
-
 
     // for (int i = 0; i < numRooms; i++) {
     //   struct openDoor openDoor = openDoors[i];
@@ -85,21 +77,21 @@ int buildRooms(void) {
     //   // might need to resest some arrays, not sure though
     // } else {
 
-    printf("amount open door: %d\n\n", amountOpenDoors);
-    
+    // printf("amount open door: %d\n\n", amountOpenDoors);
+
     int nextOpenDoor = (rand() % amountOpenDoors);
 
     createdRooms[i].xCoordinate = openDoors[nextOpenDoor].xCoordinate;
     createdRooms[i].yCoordinate = openDoors[nextOpenDoor].yCoordinate;
 
-    printf(
-        "\ni=%d, opendoors=%d, are there more rooms? %d\n\n",
-        i, amountOpenDoors, areThereRoomsToCreate);
-    printf("next room: %d\n # doors: %d\n amount room type: %d\n\n", nextRoom,
-           nextRoom + 1, roomsToCreate[nextRoom]);
-    printf("next open door: %d\n x: %d\n y: %d\n doorside: %d\n\n",
-           nextOpenDoor, openDoors[nextOpenDoor].xCoordinate,
-           openDoors[nextOpenDoor].yCoordinate);
+    // printf("\ni=%d, opendoors=%d, are there more rooms? %d\n\n", i,
+    //        amountOpenDoors, areThereRoomsToCreate);
+    // printf("next room: %d\n # doors: %d\n amount room type: %d\n\n",
+    // nextRoom,
+    //        nextRoom + 1, roomsToCreate[nextRoom]);
+    // printf("next open door: %d\n x: %d\n y: %d\n doorside: %d\n\n",
+    //        nextOpenDoor, openDoors[nextOpenDoor].xCoordinate,
+    //        openDoors[nextOpenDoor].yCoordinate);
 
     // the door we know has to exist
     if (openDoors[nextOpenDoor].sideWithDoor == top) {
@@ -117,50 +109,82 @@ int buildRooms(void) {
       // should be prioritized but left shouldn't be priotized over right
       if (createdRooms[i].top != true) {
         createdRooms[i].top = true;
-        printf("door added to top\n");
+        // printf("door added to top\n");
       } else if (createdRooms[i].left != true) {
         createdRooms[i].left = true;
-        printf("door added to left\n");
+        // printf("door added to left\n");
       } else if (createdRooms[i].right != true) {
         createdRooms[i].right = true;
-        printf("door added to right\n");
+        // printf("door added to right\n");
       } else if (createdRooms[i].bottom != true) {
         createdRooms[i].bottom = true;
-        printf("door added to bottom\n");
+        // printf("door added to bottom\n");
       }
-
     }
 
-    printf("numRooms: %d\n", numRooms);
-    showRooms(createdRooms, numRooms, 0);
+    // printf("numRooms: %zu\n", numRooms);
+    // showRooms(createdRooms, numRooms, 0);
   }
 
-
-  //now to cap off all of the doorways to nothing
+  // now to cap off all of the doorways to nothing
   amountOpenDoors = checkOpenDoors(createdRooms, openDoors, numRooms);
-  printf("amount doorways to cap off: %d\n", amountOpenDoors);
+
+  // printf("amount doorways to cap off: %d\n", amountOpenDoors);
   int preCapNumRooms = numRooms;
   int newNumRooms = preCapNumRooms + amountOpenDoors;
-  printf("precapNumRooms:%d, newNumRooms:%d, numRooms:%d \n", preCapNumRooms, newNumRooms, numRooms);
+  // printf("precapNumRooms:%d, newNumRooms:%d\n", preCapNumRooms, newNumRooms);
   int j = 0;
-  for (int i = preCapNumRooms; i < newNumRooms; i++){
+  for (int i = preCapNumRooms; i < newNumRooms; i++) {
     createdRooms[i].xCoordinate = openDoors[j].xCoordinate;
     createdRooms[i].yCoordinate = openDoors[j].yCoordinate;
-    if(openDoors[j].sideWithDoor == top){
+    if (openDoors[j].sideWithDoor == top) {
       createdRooms[i].top = true;
-    }else if (openDoors[j].sideWithDoor == bottom){
+    } else if (openDoors[j].sideWithDoor == bottom) {
       createdRooms[i].bottom = true;
-    }else if (openDoors[j].sideWithDoor == left){
+    } else if (openDoors[j].sideWithDoor == left) {
       createdRooms[i].left = true;
-    }else if ( openDoors[j].sideWithDoor == right){
+    } else if (openDoors[j].sideWithDoor == right) {
       createdRooms[i].right = true;
     }
-    numRooms ++;
+    numRooms++;
     j++;
   }
 
-  showRooms(createdRooms, numRooms, 0);
-  return 0;
+  //showRooms(createdRooms, numRooms, 0);
+
+  // fix all the problems
+
+  bool indexToRemove[MAGIC_NUMBER] = {false};
+
+  int finalNumRooms = 0;
+  struct createdRooms *finalCreatedRooms =
+      malloc(sizeof(struct createdRooms) * numRooms);
+  // printf("num room: %zu \n", numRooms);
+
+  for (int i = 0; i < numRooms; i++) {
+    bool skip = false;
+
+    for (int j = 0; j < finalNumRooms; j++) {
+      if (createdRooms[i].xCoordinate == finalCreatedRooms[j].xCoordinate &&
+          createdRooms[i].yCoordinate == finalCreatedRooms[j].yCoordinate)
+        skip = true;
+    }
+    // printf("skip: %d, i: %d\n", skip, i);
+
+    if (skip == false) {
+      finalCreatedRooms[finalNumRooms++] = createdRooms[i];
+    }
+  }
+
+  //showRooms(finalCreatedRooms, finalNumRooms, 0);
+
+  // close doors that lead to walls
+  closeDoorsToWalls(finalCreatedRooms, finalNumRooms);
+
+  printf("\n\nTHIS IS THE FINAL MAP\n\n");
+  showRooms(finalCreatedRooms, finalNumRooms, 0);
+
+  return finalCreatedRooms;
 }
 //////////////////////////////////////////////////////////////////
 ////////////////////////END FUNCTION//////////////////////////////
@@ -268,19 +292,100 @@ int checkOpenDoors(struct createdRooms createdRooms[],
   //         openDoors[i].xCoordinate,
   //         openDoors[i].yCoordinate); // debugger code
 
-    printf("open doors:\n");
-  for (int i = 0; i < MAGIC_NUMBER; i++) {
-    if (i < numRooms) {
-      printf(" %d- x:%d ,y:%d\n", i, openDoors[i].xCoordinate,
-             openDoors[i].yCoordinate != 0);
+  // printf("open doors:\n");
+  // for (int i = 0; i < MAGIC_NUMBER; i++) {
+  //   if (i < numRooms) {
+  //     printf(" %d- x:%d ,y:%d\n", i, openDoors[i].xCoordinate,
+  //            openDoors[i].yCoordinate != 0);
+  //   }
+  // }
+
+  return amountOpenDoors;
+}
+//////////////////////////////////////////////////////////////////
+////////////////////////END FUNCTION//////////////////////////////
+//////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////
+// CLOSE DOORS TO WALLS
+// checks map as its being built to see which doorways lead to walls
+// necessary for buildRooms function
+//////////////////////////////////////////////////////////////////
+int closeDoorsToWalls(struct createdRooms createdRooms[], size_t numRooms) {
+
+  bool roomExists = false;
+
+  for (int i = 0; i < numRooms; i++) {
+    if (createdRooms[i].top == true) {
+      int potXCoordinate = createdRooms[i].xCoordinate;
+      int potYCoordinate = createdRooms[i].yCoordinate + 1;
+      for (int j = 0; j < numRooms; j++) {
+        if (createdRooms[j].xCoordinate == potXCoordinate &&
+            createdRooms[j].yCoordinate == potYCoordinate) {
+          roomExists = true;
+          if (roomExists == true) {
+            if (createdRooms[j].bottom != true) {
+              createdRooms[i].top = false;
+            }
+            roomExists = false; // resets for next checks
+          }
+        }
+      }
+    }
+
+    if (createdRooms[i].bottom == true) {
+      int potXCoordinate = createdRooms[i].xCoordinate;
+      int potYCoordinate = createdRooms[i].yCoordinate - 1;
+      for (int j = 0; j < numRooms; j++) {
+        if (createdRooms[j].xCoordinate == potXCoordinate &&
+            createdRooms[j].yCoordinate == potYCoordinate) {
+          roomExists = true;
+          if (roomExists == true) {
+            if (createdRooms[j].top != true) {
+              createdRooms[i].bottom = false;
+            }
+            roomExists = false; // resets for next checks
+          }
+        }
+      }
+    }
+
+    if (createdRooms[i].left == true) {
+      int potXCoordinate = createdRooms[i].xCoordinate - 1;
+      int potYCoordinate = createdRooms[i].yCoordinate;
+      for (int j = 0; j < numRooms; j++) {
+        if (createdRooms[j].xCoordinate == potXCoordinate &&
+            createdRooms[j].yCoordinate == potYCoordinate) {
+          roomExists = true;
+          if (roomExists == true) {
+            if (createdRooms[j].right != true) {
+              createdRooms[i].left = false;
+            }
+            roomExists = false; // resets for next checks
+          }
+        }
+      }
+    }
+
+    if (createdRooms[i].right == true) {
+      int potXCoordinate = createdRooms[i].xCoordinate + 1;
+      int potYCoordinate = createdRooms[i].yCoordinate;
+      for (int j = 0; j < numRooms; j++) {
+        if (createdRooms[j].xCoordinate == potXCoordinate &&
+            createdRooms[j].yCoordinate == potYCoordinate) {
+          roomExists = true;
+          if (roomExists == true) {
+            if (createdRooms[j].left != true) {
+              createdRooms[i].right = false;
+            }
+            roomExists = false; // resets for next checks
+          }
+        }
+      }
     }
   }
 
-  //now check for places with two doorways to them
-  
-
-  
-  return amountOpenDoors;
+  return 0;
 }
 //////////////////////////////////////////////////////////////////
 ////////////////////////END FUNCTION//////////////////////////////
@@ -292,7 +397,7 @@ int checkOpenDoors(struct createdRooms createdRooms[],
 //////////////////////////////////////////////////////////////////
 int showRooms(struct createdRooms createdRooms[], int numRooms, int display) {
 
-  printf("SHOW ROOMS FUNCT:--------------------------------\n");
+  printf("\nSHOW ROOMS FUNCT:--------------------------------\n");
 
   int stringMap[MAP_SIZE][MAP_SIZE] = {0};
 
@@ -311,14 +416,14 @@ int showRooms(struct createdRooms createdRooms[], int numRooms, int display) {
   for (int i = 0; i < MAP_SIZE; i++) {
     printf("\n");
     for (int j = 0; j < MAP_SIZE; j++) {
-      if(display == 0){
-      printf("%d ", stringMap[j][i]);
+      if (display == 0) {
+        printf("%d ", stringMap[j][i]);
       }
-      if(display == 1){
-      printf("(%d,%d):%d ",i,j,stringMap[j][i]);
+      if (display == 1) {
+        printf("(%d,%d):%d ", i, j, stringMap[j][i]);
       }
     }
-    
+
     printf("\n");
   }
 

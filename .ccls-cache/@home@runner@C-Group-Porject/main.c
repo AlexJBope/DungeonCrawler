@@ -1,31 +1,35 @@
-#include <stdio.h>
+#include "buildRooms.h"
 #include "sudoClasses.h"
-
-
-
+#include <stdbool.h>
+#include <stdio.h>
 
 // defining int arrays
 
-//reintialize sudo Classes
-
-
-
+// reintialize sudo Classes
 
 //////////////////////////////////////////////////////////////////
 // START MAIN
 //////////////////////////////////////////////////////////////////
 int main(void) {
-  
-  
-  
-  
-  buildRooms();
-  psuedoClasses(1);
 
+  struct createdRooms *currentFloor;
+  Package classes;
 
+  //classes = psuedoClasses(1);
 
+  while (true) {
 
-  
+    currentFloor = buildRooms();
+    // fill rooms with things
+
+    //classes.Player.xCoordinate = 0;
+    //classes.Player.yCoordinate = 0;
+
+    //
+
+    // free(currentFloor);
+  }
+
   return 0;
 }
 //////////////////////////////////////////////////////////////////
