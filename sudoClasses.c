@@ -2,6 +2,7 @@
 
 Package psuedoClasses(int difficulty) {
 
+  
   // player stats
   struct character Player;
   Player.health = 100;  // health
