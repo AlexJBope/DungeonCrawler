@@ -1,91 +1,114 @@
 #include "sudoClasses.h"
 
-Package psuedoClasses(int difficulty) {
 
-  
+struct character buildPlayer(int chooseCharecter){
   // player stats
   struct character Player;
-  Player.health = 100;  // health
+  //balancing
+  Player.health = 100;
   Player.maxHealth = Player.health;
-  Player.defense = 15;  // defense
-  Player.strength = 30; // strength
-  Player.attack = 40;   // attack
+  Player.defense = 15;
+  Player.attack = 25;
   Player.guard = 15;
   Player.money = 0;
+  Player.strength = 30; // NOT USED
+  //logic
   Player.xCoordinate = 0;
   Player.yCoordinate = 0;
   Player.alive = true;
+  Player.ladder = false;
+  Player.floor = 0;
+  return Player;
+}
 
+
+Package psuedoClasses(int difficulty) {
+  
   // easy enemy stats
   struct entity easyEnemies;
-  easyEnemies.maxHealth = 30;
+  easyEnemies.maxHealth = 10 + (difficulty*10);
   easyEnemies.health = easyEnemies.maxHealth;    // health
-  easyEnemies.defense = 5;    // defense
-  easyEnemies.strength = 10;  // strength
-  easyEnemies.attack = 10;    // attack
-  easyEnemies.regen = 15;     // regen
-  easyEnemies.runDamage = 15; // runDamage 
-  easyEnemies.money = 10;     // money
+  easyEnemies.defense = 0 + (difficulty*10);    // defense
+  easyEnemies.strength = 0 + (difficulty*10);  // strength
+  easyEnemies.attack = 10 + (difficulty*10);    // attack
+  easyEnemies.regen = 0 + (difficulty*5);     // regen
+  easyEnemies.runDamage = 0 + (difficulty*10); // runDamage 
+  easyEnemies.money = 5 + (difficulty*5);     // money
+  //logic
   easyEnemies.alive = true;
 
+
   // medium enemy stats
+  int mediumIncrement = 5;
   struct entity mediumEnemies;
-  mediumEnemies.maxHealth = easyEnemies.health + 10;
+  mediumEnemies.maxHealth = easyEnemies.health + mediumIncrement;
   mediumEnemies.health = mediumEnemies.maxHealth;       // health
-  mediumEnemies.defense = easyEnemies.defense + 10;     // defense
-  mediumEnemies.strength = easyEnemies.strength + 10;   // strength
-  mediumEnemies.attack = easyEnemies.attack + 10;       // attack
-  mediumEnemies.regen = easyEnemies.regen + 10;         // regen
-  mediumEnemies.runDamage = easyEnemies.runDamage + 10; // runDamage
-  mediumEnemies.money = easyEnemies.money + 10;         // money
+  mediumEnemies.defense = easyEnemies.defense + mediumIncrement;     // defense
+  mediumEnemies.strength = easyEnemies.strength + mediumIncrement;   // strength
+  mediumEnemies.attack = easyEnemies.attack + mediumIncrement;       // attack
+  mediumEnemies.regen = easyEnemies.regen + mediumIncrement;         // regen
+  mediumEnemies.runDamage = easyEnemies.runDamage + mediumIncrement; // runDamage
+  mediumEnemies.money = easyEnemies.money + mediumIncrement;         // money
   mediumEnemies.alive = true;
+
   
   // hard enemy stats
+  int hardIncrement = 10;
   struct entity hardEnemies;
-  hardEnemies.maxHealth = easyEnemies.health + 10;
+  hardEnemies.maxHealth = easyEnemies.health + hardIncrement;
   hardEnemies.health = hardEnemies.maxHealth;         // health
-  hardEnemies.defense = easyEnemies.defense + 15;     // defense
-  hardEnemies.strength = easyEnemies.strength + 15;   // strength
-  hardEnemies.attack = easyEnemies.attack + 15;       // attack
-  hardEnemies.regen = easyEnemies.regen + 15;         // regen
-  hardEnemies.runDamage = easyEnemies.runDamage + 15; // runDamage
-  hardEnemies.money = easyEnemies.money + 15;         // money
+  hardEnemies.defense = easyEnemies.defense + hardIncrement;     // defense
+  hardEnemies.strength = easyEnemies.strength + hardIncrement;   // strength
+  hardEnemies.attack = easyEnemies.attack + hardIncrement;       // attack
+  hardEnemies.regen = easyEnemies.regen + hardIncrement;         // regen
+  hardEnemies.runDamage = easyEnemies.runDamage + hardIncrement; // runDamage
+  hardEnemies.money = easyEnemies.money + hardIncrement;         // money
   hardEnemies.alive = true;
   
-  //run away damage
-  //runAwayDamage = 30;
+
 
   // boss stats
   struct entity boss;
-  boss.maxHealth = 100;
+  boss.maxHealth = 100 + (difficulty*10);
   boss.health = boss.maxHealth;   // health
-  boss.defense = 20;  // defense
-  boss.attack = 30;
-  boss.strength = 100; // strength
-  boss.regen = 20;     // regen
+  boss.defense = 10 + (difficulty*10);  // defense
+  boss.attack = 30 + (difficulty*10);
+  boss.strength = 100 + (difficulty*10); // strength
+  boss.regen = 10 + (difficulty*5);     // regen
+  boss.runDamage = 0;
   boss.alive = true;
+  boss.type = rand() % 3;
 
   // modifiers
   struct actions modifiers;
   modifiers.life_up = 10;
-  modifiers.steriods = 10;
+  modifiers.steriods = 5;
   modifiers.stat_up = 10;
+  modifiers.sword = 5;
+  modifiers.armor = 5;
+  modifiers.money = 10;
 
-  // rooms  Probably isn't needed?? we need to decide
-  struct rooms roomTypes;
-  roomTypes.ladder = 100;
-  roomTypes.enemy = 100;
-  roomTypes.boss = 100;
+  
+  struct shop shopItems;
+  shopItems.armor = 20;
+  shopItems.armorCost = 50;
+  shopItems.sword = 20;
+  shopItems.swordCost = 50;
+  shopItems.lifeRestoreCost = 75;
+  shopItems.bookCost = 20;
+  shopItems.rndShopItem1 = rand() % 4;
+  shopItems.rndShopItem2 = rand() % 4;
+  shopItems.rndShopItem3 = rand() % 4;
+  
+  
 
   Package package;
-  //package.runDamage = runAwayDamage;
-  package.Player = Player;
   package.easyEnemies = easyEnemies;
   package.mediumEnemies = mediumEnemies;
   package.hardEnemies = hardEnemies;
   package.boss = boss;
   package.actions = modifiers;
-  package.rooms = roomTypes;
+  package.shopItems = shopItems;
 
   return package;
 } // end function psuedoClasses

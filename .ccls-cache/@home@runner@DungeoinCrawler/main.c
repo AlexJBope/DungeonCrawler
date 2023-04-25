@@ -1,7 +1,6 @@
+
 #include "buildRooms.h"
 #include "sudoClasses.h"
-#include <stdbool.h>
-#include <stdio.h>
 
 // defining int arrays
 
@@ -41,30 +40,36 @@ struct character movePlayer(struct character Player,
                             struct createdRooms currentRoom) {
 
   bool availableDoorways[4] = {false}; // order goes -> top, left, right, bottom
-  printf("player x :%d, y:%d\n", Player.xCoordinate, Player.yCoordinate);
-  printf("You look around the room and use your compass to face north.\n\n There "
-         "is a "
-         "door:\n");
+  printf("\n\n----Player Stats---------\n\n  Location: %d,%d\n  Floor: %d  Money"
+         ":%d\n\n  "
+         "Health "
+         ": %d/%d  Attack: %d\n  Defense: %d  Gaurd: %d\n\n-------------------------\n",
+         Player.xCoordinate, Player.yCoordinate, Player.floor, Player.money, Player.health,
+         Player.maxHealth, Player.attack, Player.defense, Player.guard);
+  printf(
+      "You look around the room and use your compass to face north.\n\n There "
+      "is a "
+      "door:\n");
   if (currentRoom.top == true) {
-    printf("  Forward \n");
+    printf("  North (w) \n");
     availableDoorways[0] = true;
   }
   if (currentRoom.left == true) {
-    printf("  Left \n");
+    printf("  West (a) \n");
     availableDoorways[1] = true;
   }
   if (currentRoom.right == true) {
-    printf("  Right \n");
+    printf("  East (d) \n");
     availableDoorways[2] = true;
   }
   if (currentRoom.bottom == true) {
-    printf("  Behind \n");
+    printf("  South (s) \n");
     availableDoorways[3] = true;
   }
 
   bool processing = true;
   char input;
-  printf("\nInput a direction:\n");
+  printf("\n--Input a direction:--\n");
   while (processing) {
     scanf("%c", &input);
     fflush(stdin);
@@ -72,24 +77,24 @@ struct character movePlayer(struct character Player,
     // while ((c = getchar()) != '\n' && c != EOF);
     // printf("input is: %c\n", input);
 
-    if (input == 'w' && availableDoorways[0] == true) {
+    if ((input == 'w' || input == 'W') && availableDoorways[0] == true) {
       // top or forward
       Player.yCoordinate++;
       processing = false;
-    } else if (input == 'a' && availableDoorways[1] == true) {
+    } else if ((input == 'a' || input == 'A') && availableDoorways[1] == true) {
       // left
       Player.xCoordinate--;
       processing = false;
-    } else if (input == 'd' && availableDoorways[2] == true) {
+    } else if ((input == 'd' || input == 'D') && availableDoorways[2] == true) {
       // right
       Player.xCoordinate++;
       processing = false;
-    } else if (input == 's' && availableDoorways[3] == true) {
+    } else if ((input == 's' || input == 'S') && availableDoorways[3] == true) {
       // bottom or back
       Player.yCoordinate--;
       processing = false;
     } else {
-      //printf("invalid input\n");
+      // printf("invalid input\n");
     }
   }
 
@@ -109,14 +114,14 @@ int takeInput(int options) {
     int input;
     printf("\n(press enter to continue)\n");
     scanf("%*c");
-    while (input != '\r' && input != '\n' && input != 'EOF') { 
-      input = getchar(); 
+    while (input != '\r' && input != '\n' && input != 'EOF') {
+      input = getchar();
     }
     // scanf('%d', &input);
     // fflush(stdin);
     system("clear");
     return 0;
-    
+
   } else if (options == 1) {
     int input;
     scanf("%d", &input);
@@ -141,6 +146,8 @@ void clearContent(struct createdRoomsList *currentFloor,
     if (currentFloor->createdRooms[i].xCoordinate == currentRoom.xCoordinate &&
         currentFloor->createdRooms[i].yCoordinate == currentRoom.yCoordinate) {
       currentFloor->createdRooms[i].content = Empty;
+      if (currentRoom.content == Shop)
+        currentFloor->createdRooms[i].content = ClossedShop;
       i = numRooms;
     }
   }
@@ -157,8 +164,8 @@ void clearContent(struct createdRoomsList *currentFloor,
 void checkStatsPlayer(struct character Player, bool stall) {
   system("clear");
   printf("------Player------\n");
-  printf("  Health:   %d/%d\n  Defense:  %d\n  Attack:   %d\n",
-         Player.health, Player.maxHealth, Player.defense, Player.attack);
+  printf("  Health:   %d/%d\n  Defense:  %d\n  Attack:   %d\n", Player.health,
+         Player.maxHealth, Player.defense, Player.attack);
   if (stall) {
     takeInput(0);
   }
@@ -167,9 +174,21 @@ void checkStatsEntity(struct entity enemy, struct character Player) {
   system("clear");
   checkStatsPlayer(Player, false);
   printf("\n------Enemy------\n");
-  printf("  Health:   %d/%d\n  Defense:  %d\n  Attack:   %d\n",
-         enemy.health, enemy.maxHealth, enemy.defense, enemy.attack);
+  printf("  Health:   %d/%d\n  Defense:  %d\n  Attack:   %d\n", enemy.health,
+         enemy.maxHealth, enemy.defense, enemy.attack);
   takeInput(0);
+}
+void checkStatsFight(struct entity enemy, struct character Player) {
+  printf("-------------------------------------------------\n");
+  printf("--------Player                      Enemy--------\n\n");
+  printf("Health:  %d/%d                    %d/%d\n", Player.health,
+         Player.maxHealth, enemy.health, enemy.maxHealth);
+  printf("Attack:    %d                         %d\n", Player.attack,
+         enemy.attack);
+  printf("Defense:   %d                         %d\n", Player.defense,
+         enemy.defense);
+  printf("Shield:    %d                         \n", Player.guard);
+  printf("-------------------------------------------------\n\n");
 }
 
 //////////////////////////////////////////////////////////////////
@@ -190,13 +209,15 @@ struct character fight(struct character Player, struct createdRooms currentRoom,
   while (Player.alive && enemy.alive) {
     while (playersTurn) {
       system("clear");
-      printf("Would you like to:\n  Attack -> 1\n  Shield -> 2\n Check Stats "
-             "-> 3\n");
+      checkStatsFight(enemy, Player);
+      printf("Would you like to:\n  Attack -> 1\n  Shield -> 2\n");
       input = takeInput(1);
       switch (input) {
       case 1:
         damage = Player.attack - enemy.defense;
-        if (damage < 0){damage = 0;}
+        if (damage < 0) {
+          damage = 0;
+        }
         enemy.health = enemy.health - damage;
         printf("Attack deals %d damage!", damage);
         playersTurn = false;
@@ -209,9 +230,6 @@ struct character fight(struct character Player, struct createdRooms currentRoom,
         shield = true;
         takeInput(0);
         input = 0;
-        break;
-      case 3:
-        checkStatsEntity(enemy, Player);
         break;
       }
     }
@@ -226,12 +244,14 @@ struct character fight(struct character Player, struct createdRooms currentRoom,
       takeInput(0);
       enemy.alive = false;
     }
+
     if (Player.alive == false || enemy.alive == false) {
       return Player;
     }
 
     int randint;
     randint = rand() % 9;
+    checkStatsFight(enemy, Player);
     // creates probabilty windows for enemy choices
     if (randint < 5) {
       damage = enemy.attack - Player.defense;
@@ -247,7 +267,7 @@ struct character fight(struct character Player, struct createdRooms currentRoom,
       takeInput(0);
     } else if (randint > 4 && randint < 8) {
       enemy.health = enemy.health + enemy.regen;
-      if (enemy.health > enemy.maxHealth){
+      if (enemy.health > enemy.maxHealth) {
         enemy.health = enemy.maxHealth;
       }
       printf("The monster rests and regains it's strength!\n It's health "
@@ -267,7 +287,7 @@ struct character fight(struct character Player, struct createdRooms currentRoom,
     if (Player.health < 1) {
       Player.alive = false;
     }
-    if (enemy.health < 1){
+    if (enemy.health < 1) {
       displayArt(4);
       printf("The enemy has been slain!\n\n");
       takeInput(0);
@@ -275,6 +295,226 @@ struct character fight(struct character Player, struct createdRooms currentRoom,
       enemy.alive = false;
     }
   }
+  return Player;
+}
+
+//////////////////////////////////////////////////////////////////
+////////////////////////END FUNCTION//////////////////////////////
+//////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////
+// DISPLAY SHOP ITEMS FUNCTION
+// displays the shop items
+//////////////////////////////////////////////////////////////////
+
+struct character displayShopItems(Package classes, struct character Player) {
+  printf("\n\nMoney: %d\n\n", Player.money);
+  printf("There are three shop items!\n\n");
+  switch (classes.shopItems.rndShopItem1) {
+  case 0:
+    printf("  1 -> $%d  Life Restore\n", classes.shopItems.lifeRestoreCost);
+    break;
+  case 1:
+    printf("  1 -> $%d  Sword  [+] %d Attack [+]\n",
+           classes.shopItems.swordCost, classes.shopItems.sword);
+    break;
+  case 2:
+    printf("  1 -> $%d  Armor  [+] %d Defense [+]\n",
+           classes.shopItems.armorCost, classes.shopItems.armor);
+    break;
+  case 3:
+    printf("  1 -> $%d  Book\n", classes.shopItems.bookCost);
+    break;
+  }
+  switch (classes.shopItems.rndShopItem2) {
+  case 0:
+    printf("  2 -> $%d  Life Restore\n", classes.shopItems.lifeRestoreCost);
+    break;
+  case 1:
+    printf("  2 -> $%d  Sword  [+] %d Attack [+]\n",
+           classes.shopItems.swordCost, classes.shopItems.sword);
+    break;
+  case 2:
+    printf("  2 -> $%d  Armor  [+] %d Defense [+]\n",
+           classes.shopItems.armorCost, classes.shopItems.armor);
+    break;
+  case 3:
+    printf("  2 -> $%d  Book\n", classes.shopItems.bookCost);
+    break;
+  }
+  switch (classes.shopItems.rndShopItem3) {
+  case 0:
+    printf("  3 -> $%d  Life Restore\n", classes.shopItems.lifeRestoreCost);
+    break;
+  case 1:
+    printf("  3 -> $%d  Sword  [+] %d Attack [+]\n",
+           classes.shopItems.swordCost, classes.shopItems.sword);
+    break;
+  case 2:
+    printf("  3 -> $%d  Armor  [+] %d Defense [+]\n",
+           classes.shopItems.armorCost, classes.shopItems.armor);
+    break;
+  case 3:
+    printf("  3 -> $%d  Book\n", classes.shopItems.bookCost);
+    break;
+  }
+  printf("  4 -> save money\n");
+
+  int input;
+  bool validInput = false;
+  while (validInput == false) {
+    input = takeInput(1);
+    printf("  You bought ");
+    if (input == 1) {
+      switch (classes.shopItems.rndShopItem1) {
+      case 0:
+        if (Player.money >= classes.shopItems.lifeRestoreCost) {
+          puts("Life Restore!");
+          Player.health = Player.maxHealth;
+          Player.money -= classes.shopItems.lifeRestoreCost;
+          return Player;
+        } else {
+          printf("You do not have enough money for this item");
+        }
+        break;
+
+      case 1:
+        if (Player.money >= classes.shopItems.swordCost) {
+          puts(" Sword!");
+          Player.attack += classes.shopItems.sword;
+          Player.money -= classes.shopItems.swordCost;
+          return Player;
+        } else {
+          printf("You do not have enough money for this item");
+        }
+        break;
+
+      case 2:
+        if (Player.money >= classes.shopItems.armorCost) {
+          puts(" Armor!");
+          Player.defense += classes.shopItems.armor;
+          Player.money -= classes.shopItems.armorCost;
+          return Player;
+        } else {
+          printf("You do not have enough money for this item");
+        }
+        break;
+
+      case 3:
+        if (Player.money >= classes.shopItems.bookCost) {
+          puts(" Book!");
+          printf("you read a book with lore about the game");
+          Player.money -= classes.shopItems.bookCost;
+          return Player;
+        } else {
+          printf("You do not have enough money for this item");
+        }
+        break;
+      }
+    }
+    if (input == 2) {
+      switch (classes.shopItems.rndShopItem2) {
+      case 0:
+        if (Player.money >= classes.shopItems.lifeRestoreCost) {
+          puts("Life Restore!");
+          Player.health = Player.maxHealth;
+          Player.money -= classes.shopItems.lifeRestoreCost;
+          return Player;
+        } else {
+          printf("You do not have enough money for this item");
+        }
+        break;
+
+      case 1:
+        if (Player.money >= classes.shopItems.swordCost) {
+          puts(" Sword!");
+          Player.attack += classes.shopItems.sword;
+          Player.money -= classes.shopItems.swordCost;
+          return Player;
+        } else {
+          printf("You do not have enough money for this item");
+        }
+        break;
+
+      case 2:
+        if (Player.money >= classes.shopItems.armorCost) {
+          puts(" Armor!");
+          Player.defense += classes.shopItems.armor;
+          Player.money -= classes.shopItems.armorCost;
+          return Player;
+        } else {
+          printf("You do not have enough money for this item");
+        }
+        break;
+
+      case 3:
+        if (Player.money >= classes.shopItems.bookCost) {
+          puts(" Book!");
+          printf("you read a book with lore about the game");
+          Player.money -= classes.shopItems.bookCost;
+          return Player;
+        } else {
+          printf("You do not have enough money for this item");
+        }
+        break;
+      }
+    }
+    if (input == 3) {
+      switch (classes.shopItems.rndShopItem3) {
+      case 0:
+        if (Player.money >= classes.shopItems.lifeRestoreCost) {
+          puts("Life Restore!");
+          Player.health = Player.maxHealth;
+          Player.money -= classes.shopItems.lifeRestoreCost;
+          return Player;
+        } else {
+          printf("You do not have enough money for this item");
+        }
+        break;
+
+      case 1:
+        if (Player.money >= classes.shopItems.swordCost) {
+          puts(" Sword!");
+          Player.attack += classes.shopItems.sword;
+          Player.money -= classes.shopItems.swordCost;
+          return Player;
+        } else {
+          printf("You do not have enough money for this item");
+        }
+        break;
+
+      case 2:
+        if (Player.money >= classes.shopItems.armorCost) {
+          puts(" Armor!");
+          Player.defense += classes.shopItems.armor;
+          Player.money -= classes.shopItems.armorCost;
+          return Player;
+        } else {
+          printf("You do not have enough money for this item");
+        }
+        break;
+
+      case 3:
+        if (Player.money >= classes.shopItems.bookCost) {
+          puts(" Book!");
+          printf("you read a book with lore about the game");
+          Player.money -= classes.shopItems.bookCost;
+          return Player;
+        } else {
+          printf("You do not have enough money for this item");
+        }
+        break;
+      }
+    } else if (input == 4) {
+      printf("nothing and choose to save your money\n");
+      return Player;
+    } else {
+      if (input != 4 && input != 3 && input != 2 && input != 1) {
+        puts("invalid response");
+      }
+    }
+  }
+  printf("shop did not change player values, invlid input, or something");
   return Player;
 }
 
@@ -292,19 +532,27 @@ struct character roomContentInteract(struct character Player,
                                      Package classes,
                                      struct createdRoomsList *createdRoomList,
                                      int numRooms) {
+
+  printf("\n\n----Player Stats---------\n\n  Location: %d,%d\n  Floor: %d  Money"
+         ":%d\n\n  "
+         "Health "
+         ": %d/%d  Attack: %d\n  Defense: %d  Gaurd: %d\n\n-------------------------\n",
+         Player.xCoordinate, Player.yCoordinate, Player.floor, Player.money, Player.health,
+         Player.maxHealth, Player.attack, Player.defense, Player.guard);
   int input = 0;
   if (currentRoom.content == Empty) {
-    printf("\n\n------------The Room Is Empty------------\n\n");
+    printf("\n\n  The Room Is Empty\n\n");
     takeInput(0);
     return Player;
 
   } else if (currentRoom.content == Ladder) {
 
-    // idk how we try and change floors, maybe add a flag to the player i guess
     displayArt(9);
-    printf("you just found a ladder, you just found a ladder, you just found a "
+    printf("you just found a ladder, you just found a ladder, you just "
+           "found a "
            "ladder\n Wonder where it goes?\n");
-    printf("   Adventure up the ladder               -> 1\n   Continue exploring the "
+    printf("   Adventure up the ladder               -> 1\n   Continue "
+           "exploring the "
            "current floor  -> 2\n");
     input = takeInput(1);
     bool validInput = false;
@@ -312,7 +560,8 @@ struct character roomContentInteract(struct character Player,
       if (input == 1) {
         printf("Cool air wafts down as you open the trap door at the top of "
                "the ladder\n");
-        printf("Ladder is still broken\n");
+
+        Player.ladder = true;
         takeInput(0);
         validInput = true;
       } else if (input == 2) {
@@ -326,50 +575,68 @@ struct character roomContentInteract(struct character Player,
     struct entity enemy;
     enemy = classes.boss;
 
-    switch(rand() % 3){
+    switch (enemy.type) {
     case 0:
-    printf("You find yourself standing in a large cold room\nBefore you sleeps a large dragon\n\n");
-    break;
+      printf("You find yourself standing in a large cold room\nBefore you "
+             "sleeps a large dragon\n\n");
+      break;
     case 1:
-    printf("You find yourself in a narrow corridor with a humanoid figure looming at the end\nIt does not appear to be particularly interested in you, yet\n\n");
-    break;
+      printf("You find yourself in a narrow corridor with a humanoid figure "
+             "looming at the end\nIt does not appear to be particularly "
+             "interested in you, yet\n\n");
+      break;
     case 2:
-    printf("A figure looms above you\nIt's rocky body almost mistakable for the wall itself\n\n");
+      printf("A figure looms above you\nIt's rocky body almost mistakable for "
+             "the wall itself\n\n");
     }
 
     bool validInput = false;
     int input;
-    while(validInput == false){
-    printf("Would you like to:\n    Fight  -> 1\n    Run    -> 2\n  Check Stats -> 3\n");
-    input = takeInput(1);
-    if (input == 1) {
+    while (validInput == false) {
+      printf("Would you like to:\n    Fight  -> 1\n    Run    -> 2\n  Check "
+             "Stats -> 3\n");
+      input = takeInput(1);
+      if (input == 1) {
         Player = fight(Player, currentRoom, enemy);
+        if (Player.alive == false)
+          return Player;
         displayArt(6);
-        printf("The slain beast leaves behind an orb of light\nThe power inside of it ends you power\n");
+        printf("The slain beast leaves behind an orb of light\nThe power "
+               "inside of it lends you its power\n");
         printf("  Increae max health -> 1\n  Increase gaurd    -> 2\n");
         int input2;
+        bool processing;
         do {
           input2 = takeInput(1);
-          if (input2 == 1){
+          if (input2 == 1) {
             Player.maxHealth += classes.actions.stat_up;
-          }else if(input2 == 2){
+            system("clear");
+            displayArt(11);
+            printf("  [+]  Max Health has been increased by %d! [+]\n",
+                   classes.actions.stat_up);
+            processing = false;
+          } else if (input2 == 2) {
             Player.guard += classes.actions.stat_up;
-          }else{
+            system("clear");
+            displayArt(10);
+            printf("  [+]  Gaurd has been increased by %d! [+]\n",
+                   classes.actions.stat_up);
+            processing = false;
+          } else {
             printf("please enter 1 or 2");
           }
-        } while(input2 != 1 || input2 != 2);
+        } while (processing);
         clearContent(createdRoomList, currentRoom, numRooms);
         validInput = true;
         takeInput(0);
 
       } else if (input == 2) {
-        printf("You take %d damage, but you get away!\n", enemy.runDamage);
-        Player.health = Player.health - enemy.runDamage;
-        validInput = true;
+        printf("You are able to sneak away without repercussion\n"),
+            validInput = true;
         takeInput(0);
 
       } else if (input == 3) {
-        checkStatsPlayer(Player, true);
+        checkStatsEntity(enemy, Player);
       } else {
         printf("invalid input");
       }
@@ -396,13 +663,15 @@ struct character roomContentInteract(struct character Player,
 
     bool validInput = false;
     while (validInput == false) {
-      printf(
-          "\n\nAn Enemy stands before you!\n\n  Would you like to:\n    Fight "
-          " -> "
-          "1\n    Run    -> 2\n  Check Stats -> 3\n");
+      printf("\n\nAn Enemy stands before you!\n\n  Would you like to:\n    "
+             "Fight "
+             " -> "
+             "1\n    Run    -> 2\n  Check Stats -> 3\n");
       input = takeInput(1);
       if (input == 1) {
         Player = fight(Player, currentRoom, enemy);
+        if (Player.alive == false)
+          return Player;
         currentRoom.content = Empty;
         displayArt(5);
         printf("You found %d Money!\n", enemy.money);
@@ -418,7 +687,7 @@ struct character roomContentInteract(struct character Player,
         takeInput(0);
 
       } else if (input == 3) {
-        checkStatsPlayer(Player, true);
+        checkStatsEntity(enemy, Player);
       } else {
         printf("invalid input");
       }
@@ -426,19 +695,34 @@ struct character roomContentInteract(struct character Player,
 
   } else if (currentRoom.content == Modifier) {
 
-    switch (rand() % 2) {
+    switch (rand() % 4) {
     case 0:
       displayArt(6);
-      printf("\nYou found a LifeRestore!\n  [+] Health has been fully restored! [+]\n");
+      printf("\nYou found a LifeRestore!\n  [+] Health has been fully "
+             "restored! [+]\n");
       Player.health = Player.maxHealth;
       clearContent(createdRoomList, currentRoom, numRooms);
       takeInput(0);
       break;
     case 1:
       displayArt(8);
-      printf("\nYou found steroids!\n  [+] Attack increased by %d [+]\n",
+      printf("\nYou found Steroids!\n  [+] Attack increased by %d [+]\n",
              classes.actions.steriods);
-      Player.strength += classes.actions.steriods;
+      Player.attack += classes.actions.steriods;
+      clearContent(createdRoomList, currentRoom, numRooms);
+      takeInput(0);
+      break;
+    case 2:
+      displayArt(5);
+      printf("\nYou found %d Money!\n", classes.actions.money);
+      Player.money += classes.actions.money;
+      clearContent(createdRoomList, currentRoom, numRooms);
+      takeInput(0);
+      break;
+    case 3:
+      displayArt(5);
+      printf("\nYou found %d Money!\n", classes.actions.money);
+      Player.money += classes.actions.money;
       clearContent(createdRoomList, currentRoom, numRooms);
       takeInput(0);
       break;
@@ -446,23 +730,40 @@ struct character roomContentInteract(struct character Player,
 
   } else if (currentRoom.content == Shop) {
     displayArt(7);
-    printf("The Shop is currently Closed");
+    puts("    Welcome to the Shop!\n");
     takeInput(0);
+    int moneyBeforeShop = Player.money;
+    Player = displayShopItems(classes, Player);
+    takeInput(0);
+    if (Player.money != moneyBeforeShop)
+      clearContent(createdRoomList, currentRoom, numRooms);
 
+  } else if (currentRoom.content == ClossedShop) {
+    displayArt(7);
+    puts("    The Shop is closed\n");
+    takeInput(0);
   } else if (currentRoom.content == Chest) {
     displayArt(0);
     printf("---------You found a Chest!---------\n");
     takeInput(0);
-    switch (rand() % 2) {
-    case 1:
-      printf("\nYou found a LifeUp!\n  [+] Health increased by %d [+]\n",
-             classes.actions.life_up);
+    switch (rand() % 3) {
+    case 0:
+      printf("\nYou found a LifeRestore!\n  [+] Health fully restored! [+]\n");
+      Player.health = Player.maxHealth;
       takeInput(0);
       break;
-    case 0:
+    case 1:
       displayArt(1);
       printf("\nYou found a Sword!\n  [+] Attack increased by %d [+]\n",
-             classes.actions.steriods);
+             classes.actions.sword);
+      Player.attack += classes.actions.sword;
+      takeInput(0);
+      break;
+    case 2:
+      // display armor
+      printf("\nYou found Armor!\n  [+] Defense increased by %d [+]\n",
+             classes.actions.armor);
+      Player.defense += classes.actions.armor;
       takeInput(0);
       break;
     }
@@ -481,10 +782,43 @@ struct character roomContentInteract(struct character Player,
 //////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////
-// ART FUNCTION
+// DISCOVER ROOM FUNCTION
+// marks a room as discovered
+//////////////////////////////////////////////////////////////////
+
+void discoverRoom(struct createdRoomsList *currentFloor,
+                  struct createdRooms currentRoom, int numRooms) {
+  for (int i = 0; i < numRooms; i++) {
+    if (currentFloor->createdRooms[i].xCoordinate == currentRoom.xCoordinate &&
+        currentFloor->createdRooms[i].yCoordinate == currentRoom.yCoordinate) {
+      currentFloor->createdRooms[i].discovered = true;
+      i = numRooms;
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////////
+////////////////////////END FUNCTION//////////////////////////////
+//////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////
+// DISPLAY ART FUNCTION
 // call functions to display art
 //////////////////////////////////////////////////////////////////
-typedef enum {chest, sword, enemy, boss, death, money, bottle, shop, steroids, ladder, shield} chooseArt;
+typedef enum {
+  chest,
+  sword,
+  enemy,
+  boss,
+  death,
+  money,
+  bottle,
+  shop,
+  steroids,
+  ladder,
+  shield,
+  heart
+} chooseArt;
 
 int displayArt(chooseArt choice) {
   switch (choice) {
@@ -558,7 +892,7 @@ int displayArt(chooseArt choice) {
     printf("        ''`---........................---''        \n");
     printf("                                                   \n");
     break;
-  
+
   case shop:
     printf("                                      \n");
     printf("   ____________________________________________________   \n");
@@ -594,7 +928,7 @@ int displayArt(chooseArt choice) {
     printf("                                                   \n");
     break;
 
-    case steroids:
+  case steroids:
     printf("                         \n");
     printf(" |___|________|_         \n");
     printf(" |___|________|_|-----   \n");
@@ -616,62 +950,105 @@ int displayArt(chooseArt choice) {
     printf("                \n");
     break;
 
-
-case shield:
-   
-    printf("           |`-._/\_.-`|               \n");
+  case shield:
+    printf("                                      \n");
+    printf("           |`-._/\\_.-`|               \n");
     printf("           |    ||    |               \n");
     printf("           |___o()o___|               \n");
     printf("           |__((<>))__|               \n");
-    printf("           \   o\/o   /               \n");
-    printf("            \   ||   /                \n");
-    printf("             \  ||  /                 \n");
+    printf("           \\   o\\/o   /               \n");
+    printf("            \\   ||   /                \n");
+    printf("             \\  ||  /                 \n");
     printf("              '.||.'                  \n");
     printf("                ``                    \n");
+    printf("                                      \n");
     break;
 
+  case heart:
+    printf("                        \n");
+    printf("        ,d88b.d88b,     \n");
+    printf("        88888888888     \n");
+    printf("        `Y8888888Y'     \n");
+    printf("          `Y888Y'       \n");
+    printf("            `Y'         \n");
+    printf("                        \n");
   }
-     
-     return 0;
+
+  return 0;
 }
 
 //////////////////////////////////////////////////////////////////
 ////////////////////////END FUNCTION//////////////////////////////
 //////////////////////////////////////////////////////////////////
 
+struct createdRoomsList *currentFloor;
+Package classes;
+struct character Player;
+struct createdRooms currentRoom;
+bool floorLoop;
+bool gameLoop;
+
 //////////////////////////////////////////////////////////////////
 // START MAIN
 //////////////////////////////////////////////////////////////////
 int main(void) {
+  system("clear");
 
-  struct createdRoomsList *currentFloor;
+  Player = buildPlayer(0);
 
-  Package classes;
-  classes = psuedoClasses(1);
-
-  struct character Player = classes.Player;
-
-  bool gameLoop = true;
+  gameLoop = true;
   while (gameLoop) {
 
     currentFloor = buildRooms();
-    struct createdRooms currentRoom;
+    Player.xCoordinate = 0;
+    Player.yCoordinate = 0;
+    Player.floor += 1;
 
-    // fill rooms with things
-
-    bool floorLoop = true;
+    classes = psuedoClasses(Player.floor);
+    floorLoop = true;
     while (floorLoop) {
+
+      // Player.xCoordinate = -4; // FOR TEST PURPOSES
+      // Player.yCoordinate = 2; // FOR TEST PURPOSES
 
       currentRoom = findCurrentRoom(Player, currentFloor);
       Player = roomContentInteract(Player, currentRoom, classes, currentFloor,
                                    currentFloor->numberOfRooms);
-      Player = movePlayer(Player, currentRoom);
+      if (Player.ladder == false && Player.alive) {
+        showRooms(currentFloor->createdRooms, currentFloor->numberOfRooms, 2,
+                  currentRoom);
+        Player = movePlayer(Player, currentRoom);
+        currentRoom = findCurrentRoom(Player, currentFloor);
+        discoverRoom(currentFloor, currentRoom, currentFloor->numberOfRooms);
+      } else if (Player.ladder == true) {
+        Player.ladder = false;
+        system("clear");
+        puts("\n\n\n      *ladder noises*    \n\n\n");
+        takeInput(0);
+        floorLoop = false;
+      } else if (Player.alive == false) {
+        system("clear");
+        puts("\n\n\n      you died :)");
+        takeInput(0);
+        floorLoop = false;
+        gameLoop = false;
+      } else {
+        puts("error in main loop player somehow isnt dead and isnt on a "
+             "ladder "
+             "yet isn't in the loop");
+      }
+
       system("clear");
     }
+    free(currentFloor->createdRooms);
+    free(currentFloor);
+    // free(buildRooms());
+    // free(currentFloor->numberOfRooms);
   }
 
-  free(currentFloor->createdRooms);
-  free(currentFloor);
+  puts("game lore becuase ur dead and you learn stuff because of it, maybe "
+       "learn based off of floor? idk idc");
+
   return 0;
 }
 //////////////////////////////////////////////////////////////////

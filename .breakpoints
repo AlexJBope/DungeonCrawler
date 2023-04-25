@@ -1,3 +1,12 @@
 {
-  "files": {}
+  "files": {
+    "buildRooms.c": [
+      {
+        "id": "af5b5b61-b48e-4d4f-adc7-06702f517e97",
+        "line": 79,
+        "version": 15683,
+        "index": 2166
+      }
+    ]
+  }
 }
