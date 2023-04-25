@@ -1023,6 +1023,7 @@ int main(void) {
     Player.floor += 1;
 
     classes = psuedoClasses(Player.floor);
+    
     floorLoop = true;
     while (floorLoop) {
 

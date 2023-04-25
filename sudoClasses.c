@@ -69,7 +69,7 @@ Package psuedoClasses(int difficulty) {
 
   // boss stats
   struct entity boss;
-  boss.maxHealth = 100 + (difficulty*10);
+  boss.maxHealth = 40 + (difficulty*10);
   boss.health = boss.maxHealth;   // health
   boss.defense = 10 + (difficulty*10);  // defense
   boss.attack = 30 + (difficulty*10);
@@ -91,9 +91,9 @@ Package psuedoClasses(int difficulty) {
 
   
   struct shop shopItems;
-  shopItems.armor = 20;
+  shopItems.armor = 10;
   shopItems.armorCost = 50;
-  shopItems.sword = 20;
+  shopItems.sword = 10;
   shopItems.swordCost = 50;
   shopItems.lifeRestoreCost = 75;
   shopItems.bookCost = 20;
