@@ -22,6 +22,7 @@ typedef enum content {
   Enemy,
   Modifier,
   Shop,
+  ClossedShop,
   Chest
 } Content;
 
@@ -35,6 +36,7 @@ struct createdRooms {
   bool left;
   bool right;
   Content content; // for room type, boss, shop, chest, etc
+  bool discovered;
 };
 
 typedef enum { top, bottom, left, right } SideWithDoor;
@@ -58,7 +60,8 @@ struct createdRoomsList{
 struct createdRoomsList *buildRooms(void);
 int checkOpenDoors(struct createdRooms roomList[], struct openDoor openDoors[],
                    size_t numRooms);
-int showRooms(struct createdRooms createdRooms[], int numRooms, int display);
+int showRoomsDebug(struct createdRooms createdRooms[], int numRooms, int display);
+void showRooms(struct createdRooms createdRooms[], int numRooms, int display, struct createdRooms currentRoom);
 int closeDoorsToWalls(struct createdRooms createdRooms[], size_t numRooms);
 int fillRooms(struct createdRooms createdRooms[], int numRooms);
 

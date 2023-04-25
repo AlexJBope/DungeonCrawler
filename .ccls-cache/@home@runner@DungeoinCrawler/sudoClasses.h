@@ -2,8 +2,10 @@
 #define SUDO_CLASSES_H
 
 
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 // defining enum arrays
 typedef enum { easy, medium, hard } Enemies; // enemy types
@@ -20,7 +22,10 @@ struct character {
   int xCoordinate;
   int yCoordinate;
   bool alive;
+  bool ladder;
+  int floor;
 };
+
 struct entity {
   int health;
   int maxHealth;
@@ -31,35 +36,44 @@ struct entity {
   int runDamage;
   int money;
   bool alive;
+  int type;
 };
 
 struct actions {
   int life_up;
   int steriods;
   int stat_up;
+  int armor;
+  int sword;
+  int money;
 };
 
-struct rooms {
-  int ladder;
-  int enemy;
-  int boss;
+struct shop{
+  int rndShopItem1;
+  int rndShopItem2;
+  int rndShopItem3;
+  int sword;
+  int swordCost;
+  int armor;
+  int armorCost;
+  int bookCost;
+  int lifeRestoreCost;
 };
+
 
 //int runAwayDamage;
 
 typedef struct {
-  struct character Player;
   struct entity easyEnemies;
   struct entity mediumEnemies;
   struct entity hardEnemies;
   struct entity boss;
   struct actions actions;
-  struct rooms rooms;
-  //int runDamage;
+  struct shop shopItems;
 } Package;
 
 
-
+struct character buildPlayer();
 Package psuedoClasses(int difficulty);
 
 #endif
